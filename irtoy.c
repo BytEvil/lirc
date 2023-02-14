@@ -339,7 +339,8 @@ static int irtoy_getversion(irtoy_t* dev)
 		log_error("irtoy_getversion: couldn't write command");
 		return 0;
 	}
-
+ 	//delay needed before reading the command result from Irtoy / Irdroid
+	usleep(100000);
 	res = read_with_timeout(dev->fd, buf,
 				IRTOY_LEN_VERSION,
 				IRTOY_TIMEOUT_VERSION);
@@ -349,6 +350,36 @@ static int irtoy_getversion(irtoy_t* dev)
 			  " or higher");
 		return 0;
 	}
+	// Send initialization commands once on init, separately from the transmit commands to avoid de-enumerating the device
+	// See gist https://gist.github.com/Irdroid/384d5144d24cba7c94e58dde75388968
+	res = write(dev->fd, IRTOY_COMMAND24, sizeof(IRTOY_COMMAND24));
+
+        if (res != sizeof(IRTOY_COMMAND24)) {
+                log_error("irtoy_send: couldn't write command 24");
+                return 0;
+        }
+	 //delay needed before reading the command result from Irtoy / Irdroid
+	usleep(20000);
+	// Send initialization commands once on init, separately from the transmit commands to avoid de-enumerating the device
+	// See gist https://gist.github.com/Irdroid/384d5144d24cba7c94e58dde75388968
+	res = write(dev->fd, IRTOY_COMMAND25, sizeof(IRTOY_COMMAND25));
+
+        if (res != sizeof(IRTOY_COMMAND25)) {
+                log_error("irtoy_send: couldn't write command 25");
+                return 0;
+        }
+	 //delay needed before reading the command result from Irtoy / Irdroid
+	usleep(20000);
+	// Send initialization commands once on init, separately from the transmit commands to avoid de-enumerating the device
+	// See gist https://gist.github.com/Irdroid/384d5144d24cba7c94e58dde75388968
+	res = write(dev->fd, IRTOY_COMMAND26, sizeof(IRTOY_COMMAND26));
+
+        if (res != sizeof(IRTOY_COMMAND26)) {
+                log_error("irtoy_send: couldn't write command 26");
+                return 0;
+        }
+	//delay needed before reading the command result from Irtoy / Irdroid
+	usleep(20000);
 
 	buf[IRTOY_LEN_VERSION] = 0;
 
